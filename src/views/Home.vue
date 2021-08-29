@@ -1,7 +1,5 @@
 <template>
   <div class="home">
-    <!-- <img alt="Vue logo" src="../assets/logo.png" /> -->
-    <!-- <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" /> -->
     <input
       class="input-search"
       type="search"
@@ -15,10 +13,6 @@
     >
       <CloseThick style="margin-top: 2px"></CloseThick> Clear selected countries
     </button>
-    <!-- <p>Selected countries</p> -->
-    <!-- <li v-for="country of selectedCountries" :key="country">
-      {{ country }}
-    </li> -->
     <div class="main-content">
       <div class="col-table col-content">
         <table class="center" :style="{ width: tableWidth }">
@@ -116,36 +110,36 @@ import {
   CloseThick,
 } from "mdue";
 
-// import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
-
 export default defineComponent({
   name: "Home",
   components: {
-    // HelloWorld,
     SortAlphabeticalAscending,
     SortAlphabeticalDescending,
     CloseThick,
   },
 
   setup() {
+    /* ------------------------------ 1. Fetch Data ----------------------------- */
     const countries = ref([]);
-
-    let sortName = ref(true);
-    let sortRegion = ref(true);
-    let sortCapital = ref(true);
-    let filter = ref("");
-
     const getTutorial = async () => {
       try {
         const response = await axios.get("rest/v2/all");
         countries.value = response.data;
-        console.log(response);
-        console.log(countries.value, "countries.value");
       } catch (error) {
         console.error(error);
       }
     };
 
+    /* -------------------------------- 2. Table -------------------------------- */
+    const tableWidth = computed(() => {
+      return selectedCountries.value.length > 0 ? "100%" : "70%";
+    });
+
+    /* ------------------------------- 3. Sorting ------------------------------- */
+    let sortName = ref(true);
+    let sortRegion = ref(true);
+    let sortCapital = ref(true);
+    let filter = ref("");
     const sortTable = (key: string) => {
       let asc: boolean;
       if (key === "name") {
@@ -155,14 +149,12 @@ export default defineComponent({
       } else {
         asc = sortCapital.value = !sortCapital.value;
       }
-
       return function innerSort(
         a: { [x: string]: string },
         b: { [x: string]: string }
       ) {
         const varA = a[key].toUpperCase();
         const varB = b[key].toUpperCase();
-
         let comparison = 0;
         if (varA > varB) {
           comparison = 1;
@@ -173,14 +165,13 @@ export default defineComponent({
       };
     };
 
+    /* ------------------------------ 5. Filtering ------------------------------ */
     const debounce = (fn: (arg0: never) => void, delay: number | undefined) => {
       let timeout: number | undefined;
-
       return (args: never) => {
         if (timeout) {
           clearTimeout(timeout);
         }
-
         timeout = setTimeout(() => {
           fn(args);
         }, delay);
@@ -190,7 +181,6 @@ export default defineComponent({
     const onInput = debounce((search) => {
       filter.value = search;
     }, 500);
-
     const filteredRows = computed(() => {
       return countries.value.filter(
         (row: { name: string; region: string; capital: string }) => {
@@ -209,20 +199,7 @@ export default defineComponent({
       );
     });
 
-    const stringHighlight = (text: string) => {
-      const matchExists = text
-        .toLowerCase()
-        .includes(filter.value.toLowerCase());
-      if (!matchExists) return text;
-
-      const re = new RegExp(filter.value, "ig");
-      return text.replace(
-        re,
-        (matchedText: string) =>
-          `<span style='background-color:#42b983'>${matchedText}</span>`
-      );
-    };
-
+    /* ---------------------------- 6. Row Selection ---------------------------- */
     const selectedCountries = ref([]);
     const selectAll = ref(false);
     const select = () => {
@@ -231,14 +208,45 @@ export default defineComponent({
         for (let i in countries.value) {
           selectedCountries.value.push(countries.value[i]);
         }
-        console.log(selectedCountries.value, "selectedCountries.value");
       }
     };
-
     const clearSelected = () => {
       selectedCountries.value = [];
     };
 
+    /* --------------------------- 7. String Higlight --------------------------- */
+    const stringHighlight = (text: string) => {
+      const matchExists = text
+        .toLowerCase()
+        .includes(filter.value.toLowerCase());
+      if (!matchExists) return text;
+      const re = new RegExp(filter.value, "ig");
+      return text.replace(
+        re,
+        (matchedText: string) =>
+          `<span style='background-color:#42b983'>${matchedText}</span>`
+      );
+    };
+
+    /* -------------------------- 8. Storage mechanisms ------------------------- */
+    onMounted(() => {
+      console.log("Component is mounted!");
+      getTutorial();
+      if (localStorage.favorites) {
+        selectedCountries.value = JSON.parse(
+          localStorage.getItem("favorites") || "{}"
+        );
+      }
+    });
+
+    watch(selectedCountries, () => {
+      localStorage.setItem(
+        "favorites",
+        JSON.stringify(selectedCountries.value)
+      );
+    });
+
+    /* ------------------------------ 9. Bonus Task ----------------------------- */
     const countriesName = computed(() => {
       let a = [];
       if (selectedCountries.value.length > 0) {
@@ -258,7 +266,6 @@ export default defineComponent({
     const option = ref({
       title: {
         text: "World Total Population",
-        // subtext: "selected countries",
         left: "center",
       },
       color: ["#42b983"],
@@ -283,38 +290,16 @@ export default defineComponent({
         boundaryGap: [0, 0.01],
       },
       yAxis: {
-        type: "category", // countries name
+        type: "category",
         data: countriesName,
       },
       series: [
         {
           name: "Population",
           type: "bar",
-          data: countriesPopulation, // countries population
+          data: countriesPopulation,
         },
       ],
-    });
-
-    const tableWidth = computed(() => {
-      return selectedCountries.value.length > 0 ? "100%" : "70%";
-    });
-
-    // mounted
-    onMounted(() => {
-      console.log("Component is mounted!");
-      getTutorial();
-      if (localStorage.favorites) {
-        selectedCountries.value = JSON.parse(
-          localStorage.getItem("favorites") || "{}"
-        );
-      }
-    });
-
-    watch(selectedCountries, () => {
-      localStorage.setItem(
-        "favorites",
-        JSON.stringify(selectedCountries.value)
-      );
     });
 
     return {
