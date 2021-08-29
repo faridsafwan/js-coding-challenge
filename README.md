@@ -16,4 +16,6 @@ We need to fetch some data from a RESTful API, display it in tabular format to a
 
 ## What app looks like
 
+[View Demo](https://jscodingchallenge.onrender.com)
+
 ![alt text](https://github.com/faridsafwan/js-coding-challenge/blob/master/src/assets/home.png)
