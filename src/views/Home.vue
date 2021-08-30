@@ -205,13 +205,12 @@ export default defineComponent({
     const select = () => {
       selectedCountries.value = [];
       if (!selectAll.value) {
-        for (let i in countries.value) {
-          selectedCountries.value.push(countries.value[i]);
-        }
+        selectedCountries.value = countries.value;
       }
     };
     const clearSelected = () => {
       selectedCountries.value = [];
+      selectAll.value = false;
     };
 
     /* --------------------------- 7. String Higlight --------------------------- */
