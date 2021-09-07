@@ -18,7 +18,7 @@
         <table class="center" :style="{ width: tableWidth }">
           <tr>
             <th>
-              <input type="checkbox" v-model="selectAll" @click="select()" />
+              <!-- <input type="checkbox" v-model="selectAll" @click="select()" /> -->
             </th>
             <th style="width: 10%">No</th>
             <th
