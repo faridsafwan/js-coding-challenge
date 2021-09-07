@@ -330,7 +330,7 @@ export default defineComponent({
 .main-content {
   display: flex;
   margin: 50px;
-  height: 600px;
+  height: 550px;
 }
 .col-content {
   flex: 1;
