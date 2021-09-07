@@ -26,6 +26,7 @@
           :rowData="rowData"
           rowSelection="multiple"
           @grid-ready="onGridReady"
+          :pagination="true"
         >
         </ag-grid-vue>
       </div>
@@ -169,6 +170,14 @@ export default defineComponent({
         headerCheckboxSelection: true,
         suppressMenu: true,
         maxWidth: 70,
+      },
+      {
+        field: "No",
+        filter: true,
+        suppressMenu: true,
+        maxWidth: 70,
+        cellStyle: { textAlign: "left" },
+        valueGetter: "node.rowIndex + 1",
       },
       {
         field: "name",

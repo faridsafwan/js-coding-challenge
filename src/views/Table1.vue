@@ -22,35 +22,35 @@
             </th>
             <th style="width: 10%">No</th>
             <th
-              style="width: 30%"
+              style="width: 30%; cursor: pointer"
               v-if="sortName"
               @click="countries.sort(sortTable('name'))"
             >
               Name <SortAlphabeticalAscending></SortAlphabeticalAscending>
             </th>
             <th
-              style="width: 30%"
+              style="width: 30%; cursor: pointer"
               v-else
               @click="countries.sort(sortTable('name'))"
             >
               Name <SortAlphabeticalDescending></SortAlphabeticalDescending>
             </th>
             <th
-              style="width: 20%"
+              style="width: 20%; cursor: pointer"
               v-if="sortRegion"
               @click="countries.sort(sortTable('region'))"
             >
               Region <SortAlphabeticalAscending></SortAlphabeticalAscending>
             </th>
             <th
-              style="width: 20%"
+              style="width: 20%; cursor: pointer"
               v-else
               @click="countries.sort(sortTable('region'))"
             >
               Region <SortAlphabeticalDescending></SortAlphabeticalDescending>
             </th>
             <th
-              style="width: 20%"
+              style="width: 20%; cursor: pointer"
               v-if="sortCapital"
               @click="countries.sort(sortTable('capital'))"
             >
@@ -58,7 +58,7 @@
               <SortAlphabeticalAscending></SortAlphabeticalAscending>
             </th>
             <th
-              style="width: 20%"
+              style="width: 20%; cursor: pointer"
               v-else
               @click="countries.sort(sortTable('capital'))"
             >
