@@ -55,7 +55,9 @@ export default defineComponent({
     const countries = ref([]);
     const getCountries = async () => {
       try {
-        const response = await axios.get("rest/v2/all");
+        const response = await axios.get(
+          "all?fields=name,capital,flags,region,population"
+        );
         rowData.value = response.data;
       } catch (error) {
         console.error(error);
@@ -97,7 +99,7 @@ export default defineComponent({
       if (selectedCountries.value.length > 0) {
         a = JSON.parse(JSON.stringify(selectedCountries.value));
       }
-      return a.map((e: { name: string }) => e.name);
+      return a.map((e: { name: { common: string } }) => e.name.common);
     });
 
     const countriesPopulation = computed(() => {
@@ -152,13 +154,10 @@ export default defineComponent({
     const columnApi = ref();
     const rowData = ref([]);
 
-    const flagCellRenderer = (params: {
-      data: { flag: string };
-      value: string;
-    }) => {
+    const flagCellRenderer = (params: { data: { flags: { svg: string } } }) => {
       var flag =
         '<img border="0" width="25" height="20" src="' +
-        params.data.flag +
+        params.data.flags.svg +
         '">';
       return '<span style="cursor: default;">' + flag + "</span>";
     };
@@ -180,7 +179,8 @@ export default defineComponent({
         valueGetter: "node.rowIndex + 1",
       },
       {
-        field: "name",
+        headerName: "Name",
+        field: "name.common",
         sortable: true,
         filter: true,
         minWidth: 120,
@@ -199,7 +199,8 @@ export default defineComponent({
         cellStyle: { textAlign: "left" },
       },
       {
-        field: "flag",
+        headerName: "Flag",
+        field: "flags",
         cellRenderer: flagCellRenderer,
         cellStyle: { textAlign: "left" },
       },

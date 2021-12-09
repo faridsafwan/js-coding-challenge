@@ -27,7 +27,7 @@ use([
   LegendComponent,
 ]);
 
-axios.defaults.baseURL = "https://restcountries.eu/";
+axios.defaults.baseURL = "https://restcountries.com/v3.1/";
 
 createApp(App)
   .use(store)

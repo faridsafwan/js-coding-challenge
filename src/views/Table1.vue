@@ -79,14 +79,18 @@
               </label>
             </td>
             <td>{{ index + 1 }}</td>
-            <td v-html="stringHighlight(country.name)"></td>
+            <td v-html="stringHighlight(country.name.common)"></td>
             <td v-html="stringHighlight(country.region)"></td>
-            <td v-html="stringHighlight(country.capital)"></td>
+            <td
+              v-html="
+                stringHighlight(country.capital[0] ? country.capital[0] : '')
+              "
+            ></td>
             <td>
               <img
                 style="width: 100px"
-                :src="country.flag"
-                :alt="country.name"
+                :src="country.flags.svg"
+                :alt="country.name.official"
               />
             </td>
           </tr>
@@ -123,8 +127,11 @@ export default defineComponent({
     const countries = ref([]);
     const getTutorial = async () => {
       try {
-        const response = await axios.get("rest/v2/all");
+        const response = await axios.get(
+          "all?fields=name,capital,flags,region,population"
+        );
         countries.value = response.data;
+        // countries.value.sort(sortTable("name"));
       } catch (error) {
         console.error(error);
       }
@@ -136,9 +143,9 @@ export default defineComponent({
     });
 
     /* ------------------------------- 3. Sorting ------------------------------- */
-    let sortName = ref(true);
-    let sortRegion = ref(true);
-    let sortCapital = ref(true);
+    let sortName = ref(false);
+    let sortRegion = ref(false);
+    let sortCapital = ref(false);
     let filter = ref("");
     const sortTable = (key: string) => {
       let asc: boolean;
@@ -149,12 +156,26 @@ export default defineComponent({
       } else {
         asc = sortCapital.value = !sortCapital.value;
       }
-      return function innerSort(
-        a: { [x: string]: string },
-        b: { [x: string]: string }
-      ) {
-        const varA = a[key].toUpperCase();
-        const varB = b[key].toUpperCase();
+      return function innerSort(a: any, b: any) {
+        let varA;
+        let varB;
+        switch (key) {
+          case "name":
+            varA = a[key].common.toLowerCase();
+            varB = b[key].common.toLowerCase();
+            break;
+          case "region":
+            varA = a[key].toLowerCase();
+            varB = b[key].toLowerCase();
+            break;
+          case "capital":
+            varA = a[key][0] ? a[key][0].toLowerCase() : "";
+            varB = b[key][0] ? b[key][0].toLowerCase() : "";
+            break;
+          default:
+            break;
+        }
+
         let comparison = 0;
         if (varA > varB) {
           comparison = 1;
@@ -183,10 +204,14 @@ export default defineComponent({
     }, 500);
     const filteredRows = computed(() => {
       return countries.value.filter(
-        (row: { name: string; region: string; capital: string }) => {
-          const name = row.name.toLowerCase();
+        (row: {
+          name: { common: string };
+          region: string;
+          capital: string;
+        }) => {
+          const name = row.name.common.toLowerCase();
           const region = row.region.toLowerCase();
-          const capital = row.capital.toLowerCase();
+          const capital = row.capital[0] ? row.capital[0].toLowerCase() : "";
 
           const searchTerm = filter.value.toLowerCase();
 
@@ -251,7 +276,7 @@ export default defineComponent({
       if (selectedCountries.value.length > 0) {
         a = JSON.parse(JSON.stringify(selectedCountries.value));
       }
-      return a.map((e: { name: string }) => e.name);
+      return a.map((e: { name: { common: string } }) => e.name.common);
     });
 
     const countriesPopulation = computed(() => {
